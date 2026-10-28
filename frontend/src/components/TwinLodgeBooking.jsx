@@ -1,8 +1,18 @@
 import { useMemo, useState } from "react";
+import HeroImg from "../assets/TwinLodgeHero.jpg";
+import Room1Img from "../assets/doan-bedroom-7921915.jpg";
+import Room2Img from "../assets/engin_akyurt-bed-4416515_1920.jpg";
+import Room3Img from "../assets/pexels-bedroom-1285156.jpg";
+import Room4Img from "../assets/tianya1223-hotel-6878058.jpg";
+import Room5Img from "../assets/bottlein-hotel-1979406_1920.jpg";
+import Room6Img from "../assets/chef_paulo_gomes-ai-generated-8154098_1920.jpg";
+import Room7Img from "../assets/interiorlens-interior-8407953_1920.jpg";
+import Room8Img from "../assets/olichel-hotel-room-1447201_1920.jpg";
+import Room9Img from "../assets/pexels-bedroom-1285156.jpg";
 
 /* ---------- Demo data (no backend) ---------- */
 // Set to a real image URL/path in your project to replace the green gradient hero.
-const HERO_IMAGE = "";
+const HERO_IMAGE = HeroImg;
 
 const GROUPS = [
   {
@@ -26,29 +36,48 @@ const GROUPS = [
 ];
 
 const ROOMS = GROUPS.flatMap((g) =>
-  [1, 2, 3].map((n) => ({
-    id: `${g.key}-${n}`,
-    group: g.key,
-    name:
-      g.key === "Presidential"
-        ? `Presidential Suite ${n}`
-        : `${g.key} Room ${n}`,
-    badge: g.badge,
-    price: g.price,
-    features: ["1 bed", "shower", "wifi", "air cond."],
-    overview:
-      g.key === "Standard"
-        ? "Queen sized bed, self contained room equipped with a shower, Wifi, Air conditioner, Fan."
-        : g.key === "Executive"
-          ? "King sized bed, spacious self contained room with a bathtub, Wifi, Air conditioner, TV and a work desk."
-          : "Our finest suite: king sized bed, lounge area, bathtub, Wifi, Air conditioner, TV and a private patio.",
-    amenities: ["Bathtub", "Shower", "Mirror", "AC", "Wifi", "TV"],
-  })),
+  [1, 2, 3].map((n) => {
+    // Select an image based on the room number or group
+    const roomImages = [
+      Room1Img,
+      Room2Img,
+      Room3Img,
+      Room4Img,
+      Room5Img,
+      Room6Img,
+      Room7Img,
+      Room8Img,
+      Room9Img,
+    ];
+    const imageIndex = (n - 1) % roomImages.length;
+
+    return {
+      id: `${g.key}-${n}`,
+      group: g.key,
+      name:
+        g.key === "Presidential"
+          ? `Presidential Suite ${n}`
+          : `${g.key} Room ${n}`,
+      badge: g.badge,
+      price: g.price,
+      features: ["1 bed", "shower", "wifi", "air cond."],
+      overview:
+        g.key === "Standard"
+          ? "Queen sized bed, self contained room equipped with a shower, Wifi, Air conditioner, Fan."
+          : g.key === "Executive"
+            ? "King sized bed, spacious self contained room with a bathtub, Wifi, Air conditioner, TV and a work desk."
+            : "Our finest suite: king sized bed, lounge area, bathtub, Wifi, Air conditioner, TV and a private patio.",
+      amenities: ["Bathtub", "Shower", "Mirror", "AC", "Wifi", "TV"],
+      images: roomImages,
+      // Store the specific image for this room card right here:
+      selectedImage: roomImages[(n - 1) % roomImages.length],
+    };
+  }),
 );
 
 const ADD_ONS = [
   { id: "breakfast", label: "Breakfast (per stay)", cost: 10 },
-  { id: "transfer", label: "Airport transfer", cost: 15 },
+  { id: "transfer", label: "Swimming", cost: 5 },
   { id: "extra-bed", label: "Extra bed", cost: 20 },
 ];
 
@@ -109,9 +138,14 @@ function BookingHome({ onSelect }) {
                 <button
                   key={r.id}
                   onClick={() => onSelect(r)}
-                  className="group flex h-60 flex-col justify-end rounded-3xl bg-slate-300 p-4 text-left transition hover:ring-4 hover:ring-orange-400 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-500"
+                  className="group relative flex h-60 flex-col justify-end overflow-hidden rounded-3xl bg-slate-300 p-4 text-left transition hover:ring-4 hover:ring-orange-400 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-500"
                 >
-                  <span className="rounded-2xl bg-white/90 px-4 py-2">
+                  <div
+                    className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105"
+                    style={{ backgroundImage: `url(${r.selectedImage})` }}
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
+                  <span className="relative z-10 rounded-2xl bg-white/90 px-4 py-2 backdrop-blur-sm">
                     <span className="block font-semibold text-slate-900">
                       {r.name}
                     </span>
@@ -204,22 +238,31 @@ function RoomDetails({ room, onBack }) {
         {/* Gallery */}
         <div className="grid grid-cols-3 gap-3 md:grid-cols-[repeat(2,7rem)_1fr]">
           <div className="order-2 col-span-3 grid grid-cols-6 gap-3 md:order-1 md:col-span-2 md:grid-cols-2">
-            {[0, 1, 2, 3, 4, 5].map((i) => (
+            {room.images.map((img, i) => (
               <button
                 key={i}
                 aria-label={`Photo ${i + 1}`}
                 onClick={() => setShot(i)}
-                className={`aspect-square rounded-2xl bg-slate-300 focus:outline-none ${
+                className={`relative aspect-square overflow-hidden rounded-2xl bg-slate-300 focus:outline-none ${
                   shot === i
                     ? "ring-4 ring-orange-500"
                     : "hover:ring-2 hover:ring-orange-300"
                 }`}
-              />
+              >
+                <div
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{ backgroundImage: `url(${img})` }}
+                />
+              </button>
             ))}
           </div>
-          <div className="order-1 col-span-3 flex h-64 items-end rounded-3xl bg-slate-300 p-4 md:order-2 md:col-span-1 md:h-auto md:min-h-104">
-            <span className="rounded-full bg-white/80 px-3 py-1 text-sm text-slate-700">
-              Photo {shot + 1} of 6
+          <div
+            className="order-1 col-span-3 flex h-64 items-end rounded-3xl bg-slate-300 p-4 md:order-2 md:col-span-1 md:h-auto md:min-h-104 bg-cover bg-center relative overflow-hidden"
+            style={{ backgroundImage: `url(${room.images[shot]})` }}
+          >
+            <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
+            <span className="relative z-10 rounded-full bg-white/80 px-3 py-1 text-sm text-slate-700 backdrop-blur-sm">
+              Photo {shot + 1} of {room.images.length}
             </span>
           </div>
         </div>
